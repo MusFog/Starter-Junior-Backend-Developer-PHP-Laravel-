@@ -15,7 +15,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN chown -R www-data:www-data /var/www
 
-EXPOSE 8080
-ENV PORT=8080
+EXPOSE 8010
+ENV PORT=8010
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8010"]
+
