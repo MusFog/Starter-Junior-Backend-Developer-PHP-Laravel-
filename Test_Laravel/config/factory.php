@@ -1,6 +1,6 @@
 <?php
 
 return [
-    'numberSpecimens' => 100,
+    'numberSpecimens' => 50000,
     'max_employee_level' => 5,
 ];
