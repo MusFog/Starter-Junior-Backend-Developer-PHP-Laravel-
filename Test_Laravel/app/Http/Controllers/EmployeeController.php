@@ -134,7 +134,6 @@ class EmployeeController extends Controller
             'supervisor_name' => $supervisor_name,
             'supervisor_id' => $request->supervisor_id,
             'employment_date' => $request->employment_date,
-            'admin_created_id' => $admin_id,
             'admin_updated_id' => $admin_id,
             'image_path' => $path,
         ]);
