@@ -3,8 +3,8 @@ version: '3.8'
 services:
   app:
     build:
-      context: dockerfiles
-      dockerfile: php.dockerfile
+      context: .
+      dockerfile: dockerfiles/php.dockerfile
     container_name: laravel_app_php
     volumes:
       - ./Test_Laravel:/var/www/laravel
