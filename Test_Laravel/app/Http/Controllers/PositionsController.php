@@ -103,7 +103,7 @@ class PositionsController extends Controller
 
     public function getPositionsListAdmin()
     {
-        $positions = auth()->user()->positions()->cursor();
+        $positions = auth()->user()->positions()->cursor()->limit(1000);
         return response()->json(iterator_to_array($positions));
     }
 
