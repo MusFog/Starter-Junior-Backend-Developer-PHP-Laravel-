@@ -76,10 +76,11 @@
 
             <div class="form-group">
                 <label for="position_id">Position</label>
-                <select name="position_id" id="position_id"
-                        class="form-control @error('position_id') is-invalid @enderror">
-                    <option value="">Loading...</option>
-                </select>
+                <select name="position_id" id="position_id" class="form-control"></select>
+                <small id="loading-positions" style="display:none;">Loading...</small>
+                <button type="button" class="btn btn-sm btn-link mt-2" id="load-more-positions" style="display: none;">
+                    Load more positions
+                </button>
                 @error('position_id')
                 <span class="invalid-feedback d-block">{{ $message }}</span>
                 @enderror
@@ -136,32 +137,70 @@
         $('#name-count').text(`${this.value.length} / 256`);
     }).trigger('input');
 
-    $(document).ready(function () {
-        $.ajax({
-            url: '{{ route('positions.get') }}',
-            method: 'GET',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            success: function (data) {
-                const select = $('#position_id');
-                select.empty().append('<option value="">Select a position</option>');
-                data.forEach(function (position) {
-                    const option = $('<option>', {
+    // $(document).ready(function () {
+    //     $.ajax({
+    //         url: '{{ route('positions.get') }}',
+    //         method: 'GET',
+    //         headers: {
+    //             'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    //         },
+    //         success: function (data) {
+    //             const select = $('#position_id');
+    //             select.empty().append('<option value="">Select a position</option>');
+    //             data.forEach(function (position) {
+    //                 const option = $('<option>', {
+    //                     value: position.id,
+    //                     text: position.name
+    //                 });
+    //                 if ('{{ old('position_id') }}' === position.id) {
+    //                     option.prop('selected', true);
+    //                 }
+    //                 select.append(option);
+    //             });
+    //         },
+    //         error: function () {
+    //             $('#position_id').empty().append('<option value="">Loading error</option>');
+    //         }
+    //     });
+    // });
+
+    let currentPage = 1;
+    let isLoading = false;
+    let hasMore = true;
+
+    function loadPositions() {
+        if (isLoading || !hasMore) return;
+
+        isLoading = true;
+        $('#loading-positions').show();
+
+        $.get('{{ route('positions.get') }}', { page: currentPage }, function (response) {
+            response.data.forEach(position => {
+                $('#position_id').append(
+                    $('<option>', {
                         value: position.id,
                         text: position.name
-                    });
-                    if ('{{ old('position_id') }}' === position.id) {
-                        option.prop('selected', true);
-                    }
-                    select.append(option);
-                });
-            },
-            error: function () {
-                $('#position_id').empty().append('<option value="">Loading error</option>');
-            }
+                    })
+                );
+            });
+
+            hasMore = response.current_page < response.last_page;
+            currentPage++;
+            $('#loading-positions').hide();
+            $('#load-more-positions').toggle(hasMore);
+            isLoading = false;
+        });
+    }
+
+    $(document).ready(function () {
+        $('#position_id').empty().append('<option value="">Select a position</option>');
+        loadPositions(); // initial
+
+        $('#load-more-positions').on('click', function () {
+            loadPositions();
         });
     });
+
 
     let nameSearchTimeout = null;
     let headSearchTimeout = null;

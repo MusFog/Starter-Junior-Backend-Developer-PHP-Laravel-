@@ -101,7 +101,7 @@ class PositionsController extends Controller
     }
 
 
-    public function getPositionsListAdmin()
+    public function getPositionsListAdmin(Request $request)
     {
 //        return response()->json(auth()->user()->positions);
 //        return response()->json(auth()->user()->positions()->limit(1000)->get());
@@ -116,24 +116,25 @@ class PositionsController extends Controller
 //
 //        return response()->json($allPositions);
 
-        return response()->stream(function () {
-            echo '[';
-            $first = true;
-            auth()->user()->positions()->chunk(1000, function ($positionsChunk) use (&$first) {
-                foreach ($positionsChunk as $position) {
-                    if (!$first) {
-                        echo ',';
-                    }
-                    echo $position->toJson();
-                    $first = false;
-                }
-            });
-            echo ']';
-        }, 200, [
-            'Content-Type' => 'application/json',
-        ]);
+//        return response()->stream(function () {
+//            echo '[';
+//            $first = true;
+//            auth()->user()->positions()->chunk(1000, function ($positionsChunk) use (&$first) {
+//                foreach ($positionsChunk as $position) {
+//                    if (!$first) {
+//                        echo ',';
+//                    }
+//                    echo $position->toJson();
+//                    $first = false;
+//                }
+//            });
+//            echo ']';
+//        }, 200, [
+//            'Content-Type' => 'application/json',
+//        ]);
 
-
+        $perPage = $request->get('per_page', 20);
+        return Position::select('id', 'name')->paginate($perPage);
     }
 
     public function removePosition($id)
