@@ -103,7 +103,8 @@ class PositionsController extends Controller
 
     public function getPositionsListAdmin()
     {
-        return response()->json(auth()->user()->positions);
+//        return response()->json(auth()->user()->positions);
+        return response()->json(auth()->user()->positions()->limit(1000)->get());
     }
 
     public function removePosition($id)

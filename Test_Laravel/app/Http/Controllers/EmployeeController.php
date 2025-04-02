@@ -110,7 +110,8 @@ class EmployeeController extends Controller
             return redirect()->route('employees-list')->with(['error' => 'Access denied']);
         }
 
-        $positions = $currentUser->positions;
+//        $positions = $currentUser->positions;
+        $positions = $currentUser->positions()->limit(1000)->get();
 
         if ($positions->isEmpty()) {
             return redirect()->route('employees-list')->with(['error' => 'No positions found']);
