@@ -219,7 +219,7 @@
         isLoading = true;
         $('#loading-positions').show();
 
-        $.get('{{ route('positions.paginated') }}', { page: currentPage }, function (response) {
+        $.get('{{ route('positions.get') }}', { page: currentPage }, function (response) {
             const select = $('#position_id');
 
             response.data.forEach(position => {
