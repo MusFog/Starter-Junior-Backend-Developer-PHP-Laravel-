@@ -110,10 +110,6 @@ class EmployeeController extends Controller
             return redirect()->route('employees-list')->with(['error' => 'Access denied']);
         }
 
-        if ($isAdmin) {
-            return redirect()->route('employees-list')->with(['error' => 'Ти є адмін']);
-        }
-
         $positions = $currentUser->positions;
 
         if ($positions->isEmpty()) {
