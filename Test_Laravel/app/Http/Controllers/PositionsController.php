@@ -103,8 +103,19 @@ class PositionsController extends Controller
 
     public function getPositionsListAdmin()
     {
-        $positions = auth()->user()->positions()->cursor();
-        return response()->json(iterator_to_array($positions));
+//        return response()->json(auth()->user()->positions);
+//        return response()->json(auth()->user()->positions()->limit(1000)->get());
+
+        $allPositions = [];
+
+        auth()->user()->positions()->chunk(1000, function ($positionsChunk) use (&$allPositions) {
+            foreach ($positionsChunk as $position) {
+                $allPositions[] = $position;
+            }
+        });
+
+        return response()->json($allPositions);
+
     }
 
     public function removePosition($id)
