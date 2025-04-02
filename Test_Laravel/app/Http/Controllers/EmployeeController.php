@@ -100,9 +100,12 @@ class EmployeeController extends Controller
 
         $currentUser = auth()->user();
 
-        $isOwner = $users->contains('id', $currentUser->id);
+        $admin = User::where('email', 'admin@gmail.com')->first();
 
-        if (!$isOwner) {
+        $isOwner = $users->contains('id', $currentUser->id);
+        $isAdmin = $admin->contains('id', $currentUser->id);
+
+        if (!$isOwner && !$isAdmin) {
             return redirect()->route('employees-list')->with(['error' => 'Access denied']);
         }
 
