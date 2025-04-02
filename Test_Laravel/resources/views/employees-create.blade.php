@@ -147,21 +147,33 @@
         isLoading = true;
         $('#loading-positions').show();
 
-        $.get('{{ route('positions.get') }}', { page: currentPage }, function (response) {
-            response.data.forEach(position => {
-                $('#position_id').append(
-                    $('<option>', {
+        $.ajax({
+            url: '{{ route('positions.get') }}',
+            method: 'GET',
+            data: { page: currentPage },
+            success: function (response) {
+                const select = $('#position_id');
+
+                response.positions.data.forEach(position => {
+                    const option = $('<option>', {
                         value: position.id,
                         text: position.name
-                    })
-                );
-            });
+                    });
 
-            hasMore = response.current_page < response.last_page;
-            currentPage++;
-            $('#loading-positions').hide();
-            $('#load-more-positions').toggle(hasMore);
-            isLoading = false;
+                    select.append(option);
+                });
+
+                hasMore = response.positions.current_page < response.positions.last_page;
+                currentPage++;
+                $('#loading-positions').hide();
+                $('#load-more-positions').toggle(hasMore);
+                isLoading = false;
+            },
+            error: function () {
+                $('#loading-positions').hide();
+                $('#position_id').append('<option value="">Loading error</option>');
+                isLoading = false;
+            }
         });
     }
 
@@ -173,7 +185,6 @@
             loadPositions();
         });
     });
-
 
     let nameSearchTimeout = null;
     let headSearchTimeout = null;
@@ -315,7 +326,6 @@
         $('#search-suggestions').empty().hide();
     });
 
-
     $(document).on('click', '#head-suggestions .list-group-item', function () {
         const name = $(this).data('name') ?? '';
         const id = $(this).data('id') ?? null;
@@ -435,6 +445,7 @@
             imageInput.classList.add('is-invalid');
         }
     };
+
     document.getElementById('image_path').addEventListener('click', function (e) {
         const currentImagePath = document.getElementById('processed_image_path').value;
         const imageError = document.getElementById('image_path_error');

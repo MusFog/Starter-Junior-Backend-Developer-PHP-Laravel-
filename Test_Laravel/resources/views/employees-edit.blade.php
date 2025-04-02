@@ -114,25 +114,20 @@
 
             <div class="form-group">
                 <label for="position_id">Position</label>
-
                 <select
                     name="position_id"
                     id="position_id"
                     class="form-control @error('position_id') is-invalid @enderror"
                 >
-                    <option value="">Select a position</option>
                 </select>
-
                 <small id="loading-positions" style="display:none;">Loading...</small>
                 <button type="button" class="btn btn-sm btn-link mt-2" id="load-more-positions" style="display: none;">
                     Load more positions
                 </button>
-
                 @error('position_id')
                 <span class="invalid-feedback d-block">{{ $message }}</span>
                 @enderror
             </div>
-
 
             <div class="form-group">
                 <label for="salary">Salary, $</label>
@@ -219,47 +214,50 @@
         isLoading = true;
         $('#loading-positions').show();
 
-        $.get('{{ route('positions.get') }}', {
-            page: currentPage,
-            selected_id: currentPositionId
-        }, function (response) {
-            const select = $('#position_id');
+        $.ajax({
+            url: '{{ route('positions.get') }}',
+            method: 'GET',
+            data: {
+                page: currentPage,
+                selected_id: currentPositionId
+            },
+            success: function (response) {
+                const select = $('#position_id');
 
-            if (currentPage === 1 && response.selected) {
-                select.append(
-                    $('<option>', {
+                if (currentPage === 1 && response.selected) {
+                    const selectedOption = $('<option>', {
                         value: response.selected.id,
                         text: response.selected.name,
                         selected: true
-                    })
-                );
-            }
+                    });
 
-            response.positions.data.forEach(position => {
-                const option = $('<option>', {
-                    value: position.id,
-                    text: position.name
+                    select.append(selectedOption);
+                }
+
+                response.positions.data.forEach(position => {
+                    const option = $('<option>', {
+                        value: position.id,
+                        text: position.name
+                    });
+
+                    if (currentPositionId === position.id) {
+                        option.prop('selected', true);
+                    }
+
+                    select.append(option);
                 });
 
-                if (currentPositionId === position.id) {
-                    option.prop('selected', true);
-                }
-
-                if (select.find(`option[value="${position.id}"]`).length === 0) {
-                    select.append(option);
-                }
-            });
-
-            hasMore = response.positions.current_page < response.positions.last_page;
-            currentPage++;
-            $('#loading-positions').hide();
-            $('#load-more-positions').toggle(hasMore);
-            isLoading = false;
-        });
-
-        }).fail(function () {
-            $('#loading-positions').hide();
-            $('#position_id').empty().append('<option value="">Loading error</option>');
+                hasMore = response.positions.current_page < response.positions.last_page;
+                currentPage++;
+                $('#loading-positions').hide();
+                $('#load-more-positions').toggle(hasMore);
+                isLoading = false;
+            },
+            error: function () {
+                $('#loading-positions').hide();
+                $('#position_id').empty().append('<option value="">Loading error</option>');
+                isLoading = false;
+            }
         });
     }
 
@@ -272,10 +270,7 @@
         });
     });
 
-
-
     let headSearchTimeout = null;
-
 
     $('#head').on('input', function () {
         clearTimeout(headSearchTimeout);
@@ -453,6 +448,7 @@
             imageInput.classList.add('is-invalid');
         }
     };
+
     document.getElementById('image_path').addEventListener('click', function (e) {
         const currentImagePath = document.getElementById('processed_image_path').value;
         const imageError = document.getElementById('image_path_error');

@@ -100,18 +100,16 @@ class PositionsController extends Controller
         return view('positions-edit', compact('position'));
     }
 
-
     public function getPositionsListAdmin(Request $request)
     {
-        $perPage = $request->get('per_page', 20);
+        $perPage = $request->get('per_page', 1000);
+
         $selectedId = $request->get('selected_id');
 
-        $query = Position::select('id', 'name');
-
-        $positions = $query->paginate($perPage);
+        $positions = Position::select('id', 'name')->paginate($perPage)->toArray();
 
         $selected = null;
-        if ($selectedId && !$positions->getCollection()->contains('id', $selectedId)) {
+        if ($selectedId && !collect($positions['data'])->contains('id', $selectedId)) {
             $selected = Position::select('id', 'name')->find($selectedId);
         }
 
@@ -120,7 +118,6 @@ class PositionsController extends Controller
             'selected' => $selected,
         ]);
     }
-
 
     public function removePosition($id)
     {
@@ -144,6 +141,4 @@ class PositionsController extends Controller
 
         return redirect()->route('positions-list')->with(['message' => 'Deleted']);
     }
-
-
 }
