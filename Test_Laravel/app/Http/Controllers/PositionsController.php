@@ -106,15 +106,33 @@ class PositionsController extends Controller
 //        return response()->json(auth()->user()->positions);
 //        return response()->json(auth()->user()->positions()->limit(1000)->get());
 
-        $allPositions = [];
+//        $allPositions = [];
+//
+//        auth()->user()->positions()->chunk(1000, function ($positionsChunk) use (&$allPositions) {
+//            foreach ($positionsChunk as $position) {
+//                $allPositions[] = $position;
+//            }
+//        });
+//
+//        return response()->json($allPositions);
 
-        auth()->user()->positions()->chunk(1000, function ($positionsChunk) use (&$allPositions) {
-            foreach ($positionsChunk as $position) {
-                $allPositions[] = $position;
-            }
-        });
+        return response()->stream(function () {
+            echo '[';
+            $first = true;
+            auth()->user()->positions()->chunk(1000, function ($positionsChunk) use (&$first) {
+                foreach ($positionsChunk as $position) {
+                    if (!$first) {
+                        echo ',';
+                    }
+                    echo $position->toJson();
+                    $first = false;
+                }
+            });
+            echo ']';
+        }, 200, [
+            'Content-Type' => 'application/json',
+        ]);
 
-        return response()->json($allPositions);
 
     }
 
