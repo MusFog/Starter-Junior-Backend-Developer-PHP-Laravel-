@@ -114,26 +114,25 @@
 
             <div class="form-group">
                 <label for="position_id">Position</label>
+
                 <select
                     name="position_id"
                     id="position_id"
                     class="form-control @error('position_id') is-invalid @enderror"
                 >
-                    @forelse($positions as $pos)
-                    <option
-                        value="{{ $pos->id }}"
-                        {{ old('position_id', $employee->position_id) == $pos->id ? 'selected' : '' }}
-                    >
-                    {{ $pos->name }}
-                    </option>
-                    @empty
-                    <option value="">Error / No positions available</option>
-                    @endforelse
+                    <option value="">Select a position</option>
                 </select>
+
+                <small id="loading-positions" style="display:none;">Loading...</small>
+                <button type="button" class="btn btn-sm btn-link mt-2" id="load-more-positions" style="display: none;">
+                    Load more positions
+                </button>
+
                 @error('position_id')
                 <span class="invalid-feedback d-block">{{ $message }}</span>
                 @enderror
             </div>
+
 
             <div class="form-group">
                 <label for="salary">Salary, $</label>
@@ -209,32 +208,53 @@
         $('#name-count').text(`${this.value.length} / 256`);
     }).trigger('input');
 
-    $(document).ready(function () {
-        const currentPositionId = '{{ old('position_id', $employee->position_id) }}';
+    let currentPage = 1;
+    let isLoading = false;
+    let hasMore = true;
+    const currentPositionId = '{{ old('position_id', $employee->position_id) }}';
 
-        $.ajax({
-            url: '{{ route('positions.get') }}',
-            method: 'GET',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            success: function (data) {
-                const select = $('#position_id');
-                select.empty().append('<option value="">Select a position</option>');
+    function loadPositions() {
+        if (isLoading || !hasMore) return;
 
-                data.forEach(function (position) {
-                    const option = $('<option>', {
-                        value: position.id,
-                        text: position.name,
-                        selected: currentPositionId === position.id
-                    });
+        isLoading = true;
+        $('#loading-positions').show();
 
-                    select.append(option);
+        $.get('{{ route('positions.paginated') }}', { page: currentPage }, function (response) {
+            const select = $('#position_id');
+
+            response.data.forEach(position => {
+                const option = $('<option>', {
+                    value: position.id,
+                    text: position.name
                 });
-            },
-            error: function () {
-                $('#position_id').empty().append('<option value="">Loading error</option>');
-            }
+
+                if (currentPositionId == position.id) {
+                    option.prop('selected', true);
+                }
+
+                select.append(option);
+            });
+
+            hasMore = response.current_page < response.last_page;
+            currentPage++;
+            $('#loading-positions').hide();
+            $('#load-more-positions').toggle(hasMore);
+            isLoading = false;
+        }).fail(function () {
+            $('#loading-positions').hide();
+            $('#position_id').empty().append('<option value="">Loading error</option>');
+        });
+    }
+
+    $(document).ready(function () {
+        $('#position_id').empty().append('<option value="">Select a position</option>');
+        loadPositions();
+
+        $('#load-more-positions').on('click', function () {
+            loadPositions();
         });
     });
+
 
 
     let headSearchTimeout = null;

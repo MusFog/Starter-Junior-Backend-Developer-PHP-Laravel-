@@ -137,33 +137,6 @@
         $('#name-count').text(`${this.value.length} / 256`);
     }).trigger('input');
 
-    // $(document).ready(function () {
-    //     $.ajax({
-    //         url: '{{ route('positions.get') }}',
-    //         method: 'GET',
-    //         headers: {
-    //             'X-CSRF-TOKEN': '{{ csrf_token() }}'
-    //         },
-    //         success: function (data) {
-    //             const select = $('#position_id');
-    //             select.empty().append('<option value="">Select a position</option>');
-    //             data.forEach(function (position) {
-    //                 const option = $('<option>', {
-    //                     value: position.id,
-    //                     text: position.name
-    //                 });
-    //                 if ('{{ old('position_id') }}' === position.id) {
-    //                     option.prop('selected', true);
-    //                 }
-    //                 select.append(option);
-    //             });
-    //         },
-    //         error: function () {
-    //             $('#position_id').empty().append('<option value="">Loading error</option>');
-    //         }
-    //     });
-    // });
-
     let currentPage = 1;
     let isLoading = false;
     let hasMore = true;
@@ -194,7 +167,7 @@
 
     $(document).ready(function () {
         $('#position_id').empty().append('<option value="">Select a position</option>');
-        loadPositions(); // initial
+        loadPositions();
 
         $('#load-more-positions').on('click', function () {
             loadPositions();
