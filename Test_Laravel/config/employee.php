@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'searchLimit' => 2,
+    'searchLimit' => 5,
 ];
