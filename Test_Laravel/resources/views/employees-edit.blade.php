@@ -219,27 +219,44 @@
         isLoading = true;
         $('#loading-positions').show();
 
-        $.get('{{ route('positions.get') }}', { page: currentPage }, function (response) {
+        $.get('{{ route('positions.get') }}', {
+            page: currentPage,
+            selected_id: currentPositionId
+        }, function (response) {
             const select = $('#position_id');
 
-            response.data.forEach(position => {
+            if (currentPage === 1 && response.selected) {
+                select.append(
+                    $('<option>', {
+                        value: response.selected.id,
+                        text: response.selected.name,
+                        selected: true
+                    })
+                );
+            }
+
+            response.positions.data.forEach(position => {
                 const option = $('<option>', {
                     value: position.id,
                     text: position.name
                 });
 
-                if (currentPositionId == position.id) {
+                if (currentPositionId === position.id) {
                     option.prop('selected', true);
                 }
 
-                select.append(option);
+                if (select.find(`option[value="${position.id}"]`).length === 0) {
+                    select.append(option);
+                }
             });
 
-            hasMore = response.current_page < response.last_page;
+            hasMore = response.positions.current_page < response.positions.last_page;
             currentPage++;
             $('#loading-positions').hide();
             $('#load-more-positions').toggle(hasMore);
             isLoading = false;
+        });
+
         }).fail(function () {
             $('#loading-positions').hide();
             $('#position_id').empty().append('<option value="">Loading error</option>');

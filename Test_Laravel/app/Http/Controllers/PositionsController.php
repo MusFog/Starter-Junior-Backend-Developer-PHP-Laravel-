@@ -103,39 +103,24 @@ class PositionsController extends Controller
 
     public function getPositionsListAdmin(Request $request)
     {
-//        return response()->json(auth()->user()->positions);
-//        return response()->json(auth()->user()->positions()->limit(1000)->get());
-
-//        $allPositions = [];
-//
-//        auth()->user()->positions()->chunk(1000, function ($positionsChunk) use (&$allPositions) {
-//            foreach ($positionsChunk as $position) {
-//                $allPositions[] = $position;
-//            }
-//        });
-//
-//        return response()->json($allPositions);
-
-//        return response()->stream(function () {
-//            echo '[';
-//            $first = true;
-//            auth()->user()->positions()->chunk(1000, function ($positionsChunk) use (&$first) {
-//                foreach ($positionsChunk as $position) {
-//                    if (!$first) {
-//                        echo ',';
-//                    }
-//                    echo $position->toJson();
-//                    $first = false;
-//                }
-//            });
-//            echo ']';
-//        }, 200, [
-//            'Content-Type' => 'application/json',
-//        ]);
-
         $perPage = $request->get('per_page', 20);
-        return Position::select('id', 'name')->paginate($perPage);
+        $selectedId = $request->get('selected_id');
+
+        $query = Position::select('id', 'name');
+
+        $positions = $query->paginate($perPage);
+
+        $selected = null;
+        if ($selectedId && !$positions->getCollection()->contains('id', $selectedId)) {
+            $selected = Position::select('id', 'name')->find($selectedId);
+        }
+
+        return response()->json([
+            'positions' => $positions,
+            'selected' => $selected,
+        ]);
     }
+
 
     public function removePosition($id)
     {
