@@ -100,10 +100,11 @@ class EmployeeController extends Controller
 
         $currentUser = auth()->user();
 
-        $admin = User::where('email', 'admin@gmail.com')->first();
+        $admin = User::firstWhere('email', 'admin@gmail.com');
 
         $isOwner = $users->contains('id', $currentUser->id);
-        $isAdmin = $admin->contains('id', $currentUser->id);
+        $isAdmin = $admin && $currentUser->id === $admin->id;
+
 
         if (!$isOwner && !$isAdmin) {
             return redirect()->route('employees-list')->with(['error' => 'Access denied']);
@@ -229,16 +230,21 @@ class EmployeeController extends Controller
             return redirect()->route('employees-list')->with(['error' => 'Invalid employee ID']);
         }
 
-        if (!$employee->position->admins->contains('id', auth()->id())) {
+        $currentUser = auth()->user();
+        $admin = User::firstWhere('email', 'admin@gmail.com');
+
+        $isOwner = $employee->position->admins->contains('id', $currentUser->id);
+        $isAdmin = $admin && $currentUser->id === $admin->id;
+
+        if (!$isOwner && !$isAdmin) {
             return redirect()->route('employees-list')->with(['error' => 'Access denied']);
         }
 
         $employee->reassignSubordinates();
-
         ImageService::deleteImage($employee->image_path);
-
         $employee->delete();
 
         return redirect()->route('employees-list')->with(['message' => 'Deleted']);
     }
+
 }

@@ -107,7 +107,13 @@ class PositionsController extends Controller
             return redirect()->route('positions-list')->with(['error' => 'Invalid position ID']);
         }
 
-        if (!$position->admins->contains('id', auth()->id())) {
+        $currentUser = auth()->user();
+        $admin = User::firstWhere('email', 'admin@gmail.com');
+
+        $isOwner = $position->admins->contains('id', $currentUser->id);
+        $isAdmin = $admin && $currentUser->id === $admin->id;
+
+        if (!$isOwner && !$isAdmin) {
             return redirect()->route('positions-list')->with(['error' => 'Access denied']);
         }
 
@@ -115,5 +121,6 @@ class PositionsController extends Controller
 
         return redirect()->route('positions-list')->with(['message' => 'Deleted']);
     }
+
 
 }
