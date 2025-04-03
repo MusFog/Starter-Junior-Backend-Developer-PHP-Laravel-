@@ -75,7 +75,7 @@
                     name="employee_name"
                     id="employee_name"
                     class="form-control @error('employee_name') is-invalid @enderror @error('user_id') is-invalid @enderror"
-                    value="{{ $employee->employee_name }}"
+                    value="{{ old('employee_name', $employee->employee_name) }}"
                     autocomplete="off"
                 >
                 <small class="text-muted d-block text-right" id="name-count">0 / 256</small>

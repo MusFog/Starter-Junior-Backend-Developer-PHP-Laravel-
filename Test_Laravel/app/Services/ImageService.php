@@ -10,10 +10,11 @@ class ImageService
 {
     public static function handleImageUpload(UploadedFile $file): string
     {
-        $image = Image::make($file->getRealPath())
-            ->orientate() // if image is .jpg and have EXIF
-            ->fit(300, 300)
-            ->encode('jpg', 80);
+        $image = Image::make($file->getRealPath());
+
+        @exif_read_data($file->getRealPath()); // if image is .jpg and have EXIF
+
+        $image->fit(300, 300)->encode('jpg', 80);
 
         $filename = uniqid() . '.jpg';
         $relativePath = "employees/photos/{$filename}";
@@ -21,6 +22,7 @@ class ImageService
 
         return $relativePath;
     }
+
 
     public static function deleteImage(?string $image_path): bool
     {
