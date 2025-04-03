@@ -90,7 +90,7 @@ class PositionsController extends Controller
         $currentUser = auth()->user();
         $admin = User::firstWhere('email', 'admin@gmail.com');
 
-        $isOwner = $position->admins->contains('id', $currentUser->id);
+        $isOwner = $currentUser && $position->admins->contains('id', $currentUser->id);
         $isAdmin = $currentUser && $admin && $currentUser->id === $admin->id;
 
         if (!($isOwner || $isAdmin)) {
@@ -135,7 +135,7 @@ class PositionsController extends Controller
         $currentUser = auth()->user();
         $admin = User::firstWhere('email', 'admin@gmail.com');
 
-        $isOwner = $position->admins->contains('id', $currentUser->id);
+        $isOwner = $currentUser && $position->admins->contains('id', $currentUser->id);
         $isAdmin = $admin && $currentUser->id === $admin->id;
 
         if (!($isOwner || $isAdmin)) {

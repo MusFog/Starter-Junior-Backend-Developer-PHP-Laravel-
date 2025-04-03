@@ -232,7 +232,7 @@ class EmployeeController extends Controller
         $currentUser = auth()->user();
         $admin = User::firstWhere('email', 'admin@gmail.com');
 
-        $isOwner = $employee->position->admins->contains('id', $currentUser->id);
+        $isOwner = $currentUser && $employee->position->admins->contains('id', $currentUser->id);
         $isAdmin = $currentUser && $admin && $currentUser->id === $admin->id;
 
         if (!($isOwner || $isAdmin)) {
