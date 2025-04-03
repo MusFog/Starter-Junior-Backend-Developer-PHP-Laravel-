@@ -30,8 +30,13 @@ class EmployeeController extends Controller
             ->editColumn('salary', fn($e) => '$' . $e->salary)
             ->editColumn('image_path', function ($e) {
                 if (!$e->image_path) return '-';
-                $src = asset('storage/' . $e->image_path);
-                return "<img src='{$src}' width='50' style='border-radius:50%'/>";
+                if (filter_var($e->image_path, FILTER_VALIDATE_URL)) {
+                    $src = $e->image_path;
+                } else {
+                    $src = asset('storage/' . $e->image_path);
+                }
+
+                return "<img src='{$src}' width='50' style='border-radius:50%' />";
             })
             ->rawColumns(['image_path'])
             ->addColumn('action', function ($e) {

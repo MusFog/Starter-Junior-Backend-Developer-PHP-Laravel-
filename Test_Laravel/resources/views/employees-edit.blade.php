@@ -37,9 +37,15 @@
 
                 @if($employee->image_path)
                 <div class="mt-2" id="photo-preview-container">
+                    @php
+                        $src = filter_var($employee->image_path, FILTER_VALIDATE_URL)
+                            ? $employee->image_path
+                            : asset('storage/' . $employee->image_path);
+                    @endphp
+
                     <img
                         id="photo-preview"
-                        src="{{ asset('storage/'.$employee->image_path) }}"
+                        src="{{ $src }}"
                         alt="Preview"
                         style="max-width: 300px;"
                     />
