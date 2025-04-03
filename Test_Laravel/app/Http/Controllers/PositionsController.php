@@ -93,7 +93,7 @@ class PositionsController extends Controller
         $isOwner = $position->admins->contains('id', $currentUser->id);
         $isAdmin = $admin && $currentUser->id === $admin->id;
 
-        if (!$isOwner && !$isAdmin) {
+        if (!$isOwner || !$isAdmin) {
             return redirect()->route('positions-list')->with(['error' => 'Access denied']);
         }
 
@@ -106,7 +106,12 @@ class PositionsController extends Controller
 
         $selectedId = $request->get('selected_id');
 
-        $positions = Position::select('id', 'name')->paginate($perPage)->toArray();
+        $user = auth()->user();
+
+        $positions = $user->positions()
+            ->select('id', 'name')
+            ->paginate($perPage)
+            ->toArray();
 
         $selected = null;
         if ($selectedId && !collect($positions['data'])->contains('id', $selectedId)) {
@@ -133,7 +138,7 @@ class PositionsController extends Controller
         $isOwner = $position->admins->contains('id', $currentUser->id);
         $isAdmin = $admin && $currentUser->id === $admin->id;
 
-        if (!$isOwner && !$isAdmin) {
+        if (!$isOwner || !$isAdmin) {
             return redirect()->route('positions-list')->with(['error' => 'Access denied']);
         }
 

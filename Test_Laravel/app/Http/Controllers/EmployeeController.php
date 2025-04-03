@@ -111,7 +111,7 @@ class EmployeeController extends Controller
 
         $isAdmin = $admin && $currentUser->id === $admin->id;
 
-        if (!$isOwner && !$isAdmin) {
+        if (!$isOwner || !$isAdmin) {
             return redirect()->route('employees-list')->with(['error' => 'Access denied']);
         }
 
@@ -235,7 +235,7 @@ class EmployeeController extends Controller
         $isOwner = $employee->position->admins->contains('id', $currentUser->id);
         $isAdmin = $admin && $currentUser->id === $admin->id;
 
-        if (!$isOwner && !$isAdmin) {
+        if (!$isOwner || !$isAdmin) {
             return redirect()->route('employees-list')->with(['error' => 'Access denied']);
         }
 
