@@ -14,7 +14,7 @@ class UpdateEmployeeImagesSeeder extends Seeder
     {
         $faker = \Faker\Factory::create();
 
-        $employees = Employee::all();
+        $employees = Employee::limit(1000)->get();
 
         foreach ($employees as $i => $employee) {
             $this->command->info('Seeding photo: ' . $i . ' count.');
