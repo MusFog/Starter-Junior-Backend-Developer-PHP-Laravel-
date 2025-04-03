@@ -239,8 +239,8 @@ class EmployeeController extends Controller
             return redirect()->route('employees-list')->with(['error' => 'Access denied']);
         }
 
-
         $employee->reassignSubordinates();
+
         ImageService::deleteImage($employee->image_path);
         $employee->delete();
 
