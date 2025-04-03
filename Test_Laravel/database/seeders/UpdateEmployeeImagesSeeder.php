@@ -14,18 +14,18 @@ class UpdateEmployeeImagesSeeder extends Seeder
     {
         $faker = \Faker\Factory::create();
 
-        $employees = Employee::limit(1000)->get();
+        Employee::chunk(1000, function ($employees) use ($faker) {
+            foreach ($employees as $i => $employee) {
+                $this->command->info('Seeding photo: ' . $i . ' count.');
 
-        foreach ($employees as $i => $employee) {
-            $this->command->info('Seeding photo: ' . $i . ' count.');
+                $gender = $faker->randomElement(['men', 'women']);
+                $photoId = $faker->numberBetween(0, 99);
 
-            $gender = $faker->randomElement(['men', 'women']);
-            $photoId = $faker->numberBetween(0, 99);
-
-            $employee->image_path = "https://randomuser.me/api/portraits/{$gender}/{$photoId}.jpg";
-            $employee->save();
-        }
-
+                $employee->image_path = "https://randomuser.me/api/portraits/{$gender}/{$photoId}.jpg";
+                $employee->save();
+            }
+        });
     }
+
 
 }
